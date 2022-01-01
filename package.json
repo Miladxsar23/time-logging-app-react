@@ -4,7 +4,7 @@
   "description": "a simple application with react",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server" : "node ./server.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Miladxsar23/time-logging-app-react#readme",
   "devDependencies": {
-    "gulp": "^4.0.2"
+    "gulp": "^4.0.2",
+    "serve": "^13.0.2"
   }
 }
