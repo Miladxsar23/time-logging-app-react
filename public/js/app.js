@@ -11,12 +11,37 @@ class App extends React.Component {
 
 //TimerDashbord -> container
 class TimersDashbord extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            timerData: [{
+                title: "Mow the lawn",
+                project: "House Chores",
+                elapsed: 5456099,
+                id: "0a4a79cb-b06d-4cb1-883d-549a1e3b66d7"
+            },
+            {
+                title: "Clear paper jam",
+                project: "Office Chores",
+                elapsed: 1273998,
+                id: "a73c1d19-f32d-4aff-b470-cea4e792406a"
+            },
+            {
+                title: "Ponder origins of universe",
+                project: "Life Chores",
+                id: "2c43306e-5b44-4ff8-8753-33c35adbd06f",
+                elapsed: 11750,
+                runningSince: 1456225941911
+            }],
+        }
+    }
     render() {
+        const { timerData } = this.state
         return (
             <div className="ui three column centered grid">
                 <div className="column">
-                    <EditableTimerList />
-                    <ToggleableTimerForm isOpen={false} />
+                    <EditableTimerList timerData={timerData} />
+                    <ToggleableTimerForm isOpen={true} />
                 </div>
             </div>
         )
@@ -25,23 +50,37 @@ class TimersDashbord extends React.Component {
 
 //EditableTimerList -> container
 class EditableTimerList extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            editForm : []
+        }
+    }
+    componentDidMount() {
+        let stateEditFormList = [];
+        this.props.timerData.forEach(item => stateEditFormList.push(false))
+        this.setState({
+            editForm : [...stateEditFormList]
+        })
+    }
     render() {
+        const {editForm} = this.state;
+        const { timerData } = this.props;
+        const row = timerData.map((data, index) => {
+            return (
+                <EditableTimerForm
+                    key={`timer-` + index}
+                    title={data.title}
+                    project={data.project}
+                    elapsed={data.elapsed}
+                    runingSince={data.runningSince || null}
+                    editForm={editForm[index]}
+                />
+            )
+        })
         return (
             <div className="timers">
-                <EditableTimerForm
-                    title="react app"
-                    project="the web app"
-                    elapsed="8986300"
-                    runingSince={null}
-                    editForm={false}
-                />
-                <EditableTimerForm
-                    title="learn extreme ironing"
-                    project="world documantation"
-                    elapsed="3890985"
-                    runingSince={null}
-                    editForm={true}
-                />
+                {row}
             </div>
         )
     }
@@ -99,6 +138,12 @@ class TimerForm extends React.Component {
 }
 //ToggleableTimerForm -> condition render
 class ToggleableTimerForm extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            isOpen: this.props.isOpen
+        }
+    }
     render() {
         if (this.props.isOpen) {
             return (
@@ -148,4 +193,4 @@ class Timer extends React.Component {
         )
     }
 }
-ReactDOM.render(<App/>, document.querySelector("#root"))
+ReactDOM.render(<App />, document.querySelector("#root"))
