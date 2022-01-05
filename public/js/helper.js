@@ -18,7 +18,18 @@ const helpers = (function() {
         }
         return str;
     }
+    // craete a new Timer Object
+    function newTimer(attr = {}) {
+        const timer = {
+            title : attr.title || 'Timer',
+            project : attr.project || "Project",
+            id : uuidv4(),
+            elapsed : 0
+        }
+        return timer;
+    }
     return {
-        renderElapsedString
+        renderElapsedString,
+        newTimer
     }
 })();
