@@ -45,25 +45,43 @@ class TimersDashbord extends React.Component {
         this.createTimer(timerAttr)
     }
     editTimer = (timer) => {
-           //update TimerData
-           let newTimerData = this.state.timerData.map(timerItem => {
-            if(timerItem.id === timer.id) return Object.assign({}, timerItem, timer)
+        //update TimerData
+        let newTimerData = this.state.timerData.map(timerItem => {
+            if (timerItem.id === timer.id) return Object.assign({}, timerItem, timer)
             else return timerItem;
         })
         this.setState({
-            timerData : newTimerData
+            timerData: newTimerData
         })
     }
     handleEditFormSubmit = (timer) => {
         this.editTimer(timer)
+    }
+    deleteForm = (timerID) => {
+        let newTimerData = this.state.timerData.filter(timer => {
+            return timer.id !== timerID
+        })
+        this.setState({
+            timerData: [...newTimerData]
+        })
+    }
+
+    handleDeleteForm = (timerID) => {
+        this.deleteForm(timerID)
     }
     render() {
         const { timerData } = this.state
         return (
             <div className="ui three column centered grid">
                 <div className="column">
-                    <EditableTimerList onFormSubmit={this.handleEditFormSubmit} timerData={timerData} />
-                    <ToggleableTimerForm onFormSubmit={this.handleCreateFormSubmit} />
+                    <EditableTimerList
+                        onFormSubmit={this.handleEditFormSubmit}
+                        onDeleteForm={this.handleDeleteForm}
+                        timerData={timerData}
+                    />
+                    <ToggleableTimerForm
+                        onFormSubmit={this.handleCreateFormSubmit}
+                    />
                 </div>
             </div>
         )
@@ -84,6 +102,7 @@ class EditableTimerList extends React.Component {
                     elapsed={data.elapsed}
                     runingSince={data.runningSince || null}
                     onFormSubmit={this.props.onFormSubmit}
+                    onDeleteForm={this.props.onDeleteForm}
                 />
             )
         })
@@ -137,6 +156,7 @@ class EditableTimerForm extends React.Component {
                     elapsed={this.props.elapsed}
                     runingSince={this.props.runingSince}
                     onOpenForm={this.handleFormToggle}
+                    onDeleteForm={this.props.onDeleteForm}
                 />
             )
         }
@@ -211,7 +231,10 @@ class ToggleableTimerForm extends React.Component {
     render() {
         if (this.state.isOpen) {
             return (
-                <TimerForm onFormClose={this.handleFormToggle} onFormSubmit={this.handleFormSubmit} />
+                <TimerForm
+                    onFormClose={this.handleFormToggle}
+                    onFormSubmit={this.handleFormSubmit}
+                />
             )
         } else {
             return (
@@ -226,6 +249,18 @@ class ToggleableTimerForm extends React.Component {
 }
 //Timer -> container + action
 class Timer extends React.Component {
+    handleDeleteForm = (e) => {
+        this.props.onDeleteForm(this.props.id)
+    }
+    componentDidMount() {
+        this.forceUpdateInterval = setInterval(() => this.forceUpdate(), 50)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.forceUpdateInterval)
+    }
+    
+
     render() {
         const { title, project, elapsed, runingSince, onOpenForm } = this.props;
         const elapsedString = helpers.renderElapsedString(elapsed, runingSince);
@@ -247,7 +282,7 @@ class Timer extends React.Component {
                         <span className="right floated edit icon cursor-pointer" onClick={onOpenForm}>
                             <i className="edit icon"></i>
                         </span>
-                        <span className="right floated trash icon cursor-pointer">
+                        <span className="right floated trash icon cursor-pointer" onClick={this.handleDeleteForm}>
                             <i className="trash icon"></i>
                         </span>
                     </div>
