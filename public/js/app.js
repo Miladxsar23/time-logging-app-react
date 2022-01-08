@@ -31,7 +31,7 @@ class TimersDashbord extends React.Component {
                 project: "Life Chores",
                 id: uuidv4(),
                 elapsed: 11750,
-                runningSince: 1456225941911
+                runningSince: 1641456095442
             }]
         }
     }
@@ -69,6 +69,35 @@ class TimersDashbord extends React.Component {
     handleDeleteForm = (timerID) => {
         this.deleteForm(timerID)
     }
+    startClick = (timerID) => {
+      const now = Date.now()
+      this.setState({
+          timerData : this.state.timerData.map(timer => {
+              if(timer.id === timerID)
+                return Object.assign({}, timer, {runningSince : now})
+              else 
+                return timer;  
+          })
+      })
+    }
+    stopClick = (timerID) => {
+        const now = Date.now()
+        this.setState({
+            timerData : this.state.timerData.map(timer => {
+                if(timer.id === timerID && timer.runningSince){
+                    const newElapsed = timer.elapsed + (now - timer.runningSince)
+                    return Object.assign({}, timer, {elapsed : newElapsed, runningSince : null})
+                }else 
+                    return timer;
+            })
+        })
+    }
+    handleStartClick = (timerID) => {
+        this.startClick(timerID)
+    }
+    handleStopClick = (timerID) => {
+        this.stopClick(timerID)
+    }
     render() {
         const { timerData } = this.state
         return (
@@ -78,6 +107,8 @@ class TimersDashbord extends React.Component {
                         onFormSubmit={this.handleEditFormSubmit}
                         onDeleteForm={this.handleDeleteForm}
                         timerData={timerData}
+                        onStartTimer={this.handleStartClick}
+                        onStopTimer={this.handleStopClick}
                     />
                     <ToggleableTimerForm
                         onFormSubmit={this.handleCreateFormSubmit}
@@ -103,6 +134,8 @@ class EditableTimerList extends React.Component {
                     runingSince={data.runningSince || null}
                     onFormSubmit={this.props.onFormSubmit}
                     onDeleteForm={this.props.onDeleteForm}
+                    onStartTimer={this.props.onStartTimer}
+                    onStopTimer={this.props.onStopTimer}
                 />
             )
         })
@@ -157,6 +190,8 @@ class EditableTimerForm extends React.Component {
                     runingSince={this.props.runingSince}
                     onOpenForm={this.handleFormToggle}
                     onDeleteForm={this.props.onDeleteForm}
+                    onStartTimer={this.props.onStartTimer}
+                    onStopTimer={this.props.onStopTimer}
                 />
             )
         }
@@ -259,8 +294,13 @@ class Timer extends React.Component {
     componentWillUnmount() {
         clearInterval(this.forceUpdateInterval)
     }
-    
+    handleStartClick = () => {
+        this.props.onStartTimer(this.props.id)
+    }
 
+    handleStopClick = () => {
+        this.props.onStopTimer(this.props.id)
+    }
     render() {
         const { title, project, elapsed, runingSince, onOpenForm } = this.props;
         const elapsedString = helpers.renderElapsedString(elapsed, runingSince);
@@ -287,9 +327,22 @@ class Timer extends React.Component {
                         </span>
                     </div>
                 </div>
-                <div className="ui bottom attached blue basic button" type="button">Start</div>
+                <TimerActionButton runingSince={!!runingSince} onStartTimer={this.handleStartClick} onStopTimer={this.handleStopClick} />
             </div>
         )
+    }
+}
+class TimerActionButton extends React.Component {
+    render() {
+        if (this.props.runingSince) {
+            return (
+                <div className="ui bottom attached red basic button" type="button" onClick={this.props.onStopTimer}>Stop</div>
+            )
+        } else {
+            return (
+                <div className="ui bottom attached green basic button" type="button" onClick={this.props.onStartTimer}>Start</div>
+            )
+        }
     }
 }
 ReactDOM.render(<App />, document.querySelector("#root"))
