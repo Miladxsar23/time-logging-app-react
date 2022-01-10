@@ -1,3 +1,5 @@
+
+
 //App -> Complete container
 class App extends React.Component {
     render() {
@@ -14,26 +16,21 @@ class TimersDashbord extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            timerData: [{
-                title: "Mow the lawn",
-                project: "House Chores",
-                elapsed: 5456099,
-                id: uuidv4()
-            },
-            {
-                title: "Clear paper jam",
-                project: "Office Chores",
-                elapsed: 1273998,
-                id: uuidv4()
-            },
-            {
-                title: "Ponder origins of universe",
-                project: "Life Chores",
-                id: uuidv4(),
-                elapsed: 11750,
-                runningSince: 1641456095442
-            }]
+            timerData: []
         }
+    }
+    handleLoadTimerFromServer = () => {
+        client.getTimers().then(res => {
+            this.setState({
+                timerData : [...res]
+            })
+        }, failure => {
+            console.log(failure)
+        })
+    }
+    componentDidMount() {
+        this.handleLoadTimerFromServer();
+        setInterval(() => this.handleLoadTimerFromServer(), 5000)
     }
     createTimer = (timerAttr) => {
         let timer = helpers.newTimer(timerAttr)
@@ -345,4 +342,5 @@ class TimerActionButton extends React.Component {
         }
     }
 }
+
 ReactDOM.render(<App />, document.querySelector("#root"))

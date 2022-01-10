@@ -58,7 +58,7 @@ app.post("/api/timers/start", (req, res) => {
             let timers = JSON.parse(data)
             timers.forEach(timer => {
                 if (timer.id === req.body.id)
-                    timer.runningSince = req.body.runningSince;
+                    timer.runningSince = req.body.start;
             })
             writeFile(DATA_FILE, JSON.stringify(timers), () => {
                 res.setHeader("Cache-Control", "no-cache")
