@@ -20,7 +20,8 @@ app.get("/api/timers", (req, res) => {
             throw err;
         else
             res.setHeader("Cache-Control", "no-cache");
-        res.json(JSON.parse(timers))
+            res.json(JSON.parse(timers))
+            res.end()
     })
 })
 
@@ -85,7 +86,7 @@ app.post("/api/timers/stop", (req, res) => {
             writeFile(DATA_FILE, JSON.stringify(timers), () => {
                 res.setHeader("Cache-Control", "no-cache");
                 res.json({})
-                json.end()
+                res.end()
             })
         }
     })

@@ -20,13 +20,17 @@ class TimersDashbord extends React.Component {
         }
     }
     handleLoadTimerFromServer = () => {
-        client.getTimers().then(res => {
-            this.setState({
-                timerData : [...res]
+        try {
+            client.getTimers().then(res => {
+                this.setState({
+                    timerData: [...res]
+                })
+            }, failure => {
+                console.log(failure)
             })
-        }, failure => {
-            console.log(failure)
-        })
+        }catch(err) {
+            console.error(err.message)
+        }
     }
     componentDidMount() {
         this.handleLoadTimerFromServer();
@@ -67,27 +71,29 @@ class TimersDashbord extends React.Component {
         this.deleteForm(timerID)
     }
     startClick = (timerID) => {
-      const now = Date.now()
-      this.setState({
-          timerData : this.state.timerData.map(timer => {
-              if(timer.id === timerID)
-                return Object.assign({}, timer, {runningSince : now})
-              else 
-                return timer;  
-          })
-      })
+        const now = Date.now()
+        this.setState({
+            timerData: this.state.timerData.map(timer => {
+                if (timer.id === timerID)
+                    return Object.assign({}, timer, { runningSince: now })
+                else
+                    return timer;
+            })
+        })
+        client.startTimer({id : timerID, start : now}).then(res => console.log("ok"))
     }
     stopClick = (timerID) => {
         const now = Date.now()
         this.setState({
-            timerData : this.state.timerData.map(timer => {
-                if(timer.id === timerID && timer.runningSince){
+            timerData: this.state.timerData.map(timer => {
+                if (timer.id === timerID && timer.runningSince) {
                     const newElapsed = timer.elapsed + (now - timer.runningSince)
-                    return Object.assign({}, timer, {elapsed : newElapsed, runningSince : null})
-                }else 
+                    return Object.assign({}, timer, { elapsed: newElapsed, runningSince: null })
+                } else
                     return timer;
             })
         })
+        client.stopTimer({id : timerID, stop : now}).then(res => {})
     }
     handleStartClick = (timerID) => {
         this.startClick(timerID)
